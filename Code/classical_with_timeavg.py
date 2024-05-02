@@ -214,3 +214,20 @@ def time_average(positions, num_steps, dt):
     for i in range(len(positions)):
         L.append( [(positions[i][-1][0]*dt)/T, (positions[i][-1][1]*dt)/T, (positions[i][-1][2]*dt)/T] )
     return sum_corresponding_elements(L)
+
+'''def time_average(distances_i):
+    initpos = distances_i[0]
+    print(distances_i[0])
+    Ts = []
+    for j in range(len(distances_i)):
+        if abs(distances_i[j] - initpos) < 1e-16:
+            Ts.append(j)
+
+    return Ts
+
+print(time_average(distances_i))'''
+
+#the output of code above was: [0, 1214, 1215, 1216, 2430, 2431, 2432, 3645, 3646, 3647, 4861, 4862, 4863, 6077, 6078, 6079, 7293, 7294, 7295, 8508, 8509, 8510, 9724, 9725, 9726]
+# We shall take: [0, 1215,  2431,  3646,  4862,  6078,  7294,  8509,  9725]
+
+Ts = [0, 1215,  2431,  3646,  4862,  6078,  7294,  8509,  9725]
