@@ -101,29 +101,14 @@ class CrankNicolsonSolver:
         self.U = U
 
 
-# Gaussian initial condition parameters
-U0 = 2
-sigma = 5
-x0 = 50
-
-class Gaussian:
-    """Gaussian function"""
-    def __init__(self, width, amplitude, x0):
-        """Create Gaussian with the given width (standard deviation) and amplitude, centered at x = x0"""
-        self.width = width
-        self.amplitude = amplitude
-        self.x0 = x0
-
-    def __call__(self, x):
-        """Evaluate the Gaussian function at x"""
-        return self.amplitude * np.exp(-((x - self.x0) ** 2) / ( (self.width ** 2)))
-
-gauss = Gaussian(sigma, U0, x0)
+hbarbym = 1
+oneoverhbar = 1
+coloumbbyplanck = 1
 # Domain and problem parameters
-L = 10000  # Length of the domain
-T = 200  # Total time
-J = 10000  # Number of spatial steps
-N = 1000  # Number of time steps
+L = 1  # Length of the domain
+T = 1e-2  # Total time
+J = 600  # Number of spatial steps
+N = 10000  # Number of time steps
 
 # Generating 100 points from -3 to 3
 x = np.linspace(0, 100, 600)
@@ -144,23 +129,22 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.linalg import solve
 
-D = 1j
+D = (0.5j)*hbarbym
 V = 0.0
 
 
 # Source term function (set to 0 for simplicity)
 def f(u,x):
-    E = 10e-12
-    coulomb = 2.3070775389e-28
+    E = 1e-3
     if x == 0 :
         return 0
     else:
-        return (E*x*u - coulomb*u/x)*(-1j)
+        return (E*x*u - coloumbbyplanck*u/x)*(-1j)
 
 
 # Initialize and solve
 def u_0(x):
-    a = 1# bohr radius
+    a = 1.11211e-2# bohr radius
     return x*(a**(-3/2))*np.exp(-x/a)/np.sqrt(np.pi) #U1,0,0 state
 
 solver = CrankNicolsonSolver(D, V, f, L, T, J, N, u_0)
