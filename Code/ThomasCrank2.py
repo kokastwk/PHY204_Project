@@ -180,7 +180,7 @@ plt.title('Probability Density at Final Time')
 plt.show()
 print("Done")
 
-#plot psinorm vs t
+#plot rexpec vs t
 plt.figure(figsize=(10, 5))
 plt.plot([t*T/N for t in range(len(final_solution))], [rexpec(final_solution[t]) for t in range(len(final_solution))], linestyle='--')
 plt.xlabel('t')
