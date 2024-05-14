@@ -101,41 +101,28 @@ class CrankNicolsonSolver:
         self.U = U
 
 
+
+
+
+
+
+
+
 hbarbym = 1
 oneoverhbar = 1
 coloumbbyplanck = 1
 # Domain and problem parameters
 L = 1  # Length of the domain
-T = 1e-2  # Total time
-J = 600  # Number of spatial steps
-N = 10000  # Number of time steps
-
-# Generating 100 points from -3 to 3
-x = np.linspace(0, 100, 600)
-# Gaussian function
-
-
-'''# Plotting
-plt.figure(figsize=(8, 5))
-plt.plot(x, gauss(x), label='Standard Gaussian')
-plt.title('Standard Gaussian Distribution')
-plt.xlabel('x')
-plt.ylabel('f(x)')
-plt.legend()
-plt.grid(True)
-plt.show()'''
-
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.linalg import solve
-
+T = 1e-3  # Total time
+J = 1000  # Number of spatial steps
+N = 10000 # Number of time steps
+# for J = 1000, stability until 0.5. 0.5 Unstable at J= 3000. J variation stability seems to be increasing with length
 D = (0.5j)*hbarbym
 V = 0.0
 
-
 # Source term function (set to 0 for simplicity)
 def f(u,x):
-    E = 1e-3
+    E = 2e-2
     if x == 0 :
         return 0
     else:
@@ -148,22 +135,133 @@ def u_0(x):
     return x*(a**(-3/2))*np.exp(-x/a)/np.sqrt(np.pi) #U1,0,0 state
 
 solver = CrankNicolsonSolver(D, V, f, L, T, J, N, u_0)
-
-# print(len(solver.U))
-
 solver.simulate()
-
 final_solution = solver.U
-k = 999
 
+
+
+
+
+
+
+
+
+
+def probd(u):
+    return [((np.abs(u[k])/k)**2)*(J/L) for k in range(1,len(u))]
+
+def rexpec(u):
+    return np.sum([((np.abs(u[k]))**2)/k for k in range(1,len(u))])
+
+def psinorm(u):
+    return np.sum(probd(u))
+
+
+
+
+
+
+
+
+
+
+#plot psinorm vs t
+plt.figure(figsize=(10, 5))
+plt.plot([t*T/N for t in range(len(final_solution))], [psinorm(final_solution[t]) for t in range(len(final_solution))], linestyle='--')
+plt.xlabel('t')
+plt.ylabel('Psinorm(t)')
+plt.title('Psinorm(t)')
+plt.show()
+print("Done")
+
+#plot probd vs x
+plt.figure(figsize=(10, 5))
+plt.plot([x*L/J for x in range(1,len(final_solution[len(final_solution)-1]))], probd(final_solution[len(final_solution)-1]), linestyle='--')
+plt.xlabel('x')
+plt.ylabel('ProbDens')
+plt.title('Probability Density at Final Time')
+plt.show()
+print("Done")
+
+#plot expecr vs t
+plt.figure(figsize=(10, 5))
+plt.plot([t*T/N for t in range(len(final_solution))], [rexpec(final_solution[t]) for t in range(len(final_solution))], linestyle='--')
+plt.xlabel('t')
+plt.ylabel('Rexpec')
+plt.title('Rexpec(t)')
+plt.show()
+print("Done")
+
+
+
+
+
+
+
+
+
+
+k = 999
 # print(len(solver.U))
 # Plot the numerical and analytical solutions for comparison
 plt.figure(figsize=(10, 5))
-plt.plot(solver.x, [final_solution[k][i].real for i in range(len(final_solution[k]))], linestyle='--')
-plt.plot(solver.x, [final_solution[k][i].imag for i in range(len(final_solution[k]))], linestyle='--')
-plt.plot(solver.x, [np.linalg.norm(final_solution[k][i]) for i in range(len(final_solution[k]))], linestyle='--')
+plt.plot(solver.x[1:], [(final_solution[k][i].real)/(i*(L/J)) for i in range(1,len(final_solution[k]))], linestyle='--')
+plt.plot(solver.x[1:], [(final_solution[k][i].imag)/(i*(L/J)) for i in range(1,len(final_solution[k]))], linestyle='--')
+plt.plot(solver.x[1:],[np.linalg.norm(final_solution[k][i])/(i*(L/J)) for i in range(1,len(final_solution[k]))], linestyle='--')
 #plt.plot(solver.x, u_analytical, label='Analytical Solution', linestyle='-.')
 plt.xlabel('x')
-plt.ylabel('u(x,T)')
-plt.title('Comparison of Numerical and Analytical Solutions')
+plt.ylabel('psi(x,T)')
+plt.title('Wavefunction versus space at T = '+str(T))
 plt.show()
+print("Done")
+
+
+
+
+
+k = len(final_solution)-1
+# print(len(solver.U))
+# Plot the numerical and analytical solutions for comparison
+plt.figure(figsize=(10, 5))
+#plt.plot(solver.x[1:], [(final_solution[k][i].real) for i in range(1,len(final_solution[k]))], linestyle='--')
+plt.plot(solver.x[1:], [(final_solution[k][i].real)/(i*(L/J)) for i in range(1,len(final_solution[k]))], linestyle='--')
+plt.plot(solver.x[1:], [(final_solution[k][i].imag)/(i*(L/J)) for i in range(1,len(final_solution[k]))], linestyle='--')
+plt.plot(solver.x[1:],[np.linalg.norm(final_solution[k][i])/(i*(L/J)) for i in range(1,len(final_solution[k]))], linestyle='--')
+#plt.plot(solver.x, u_analytical, label='Analytical Solution', linestyle='-.')
+plt.xlabel('x')
+plt.ylabel('psi(x,T)')
+plt.title('Wavefunction versus space at T = '+str(T))
+plt.show()
+print("Done")
+
+
+
+
+
+
+
+
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+
+def generate_animation(x, y):
+    # Create a figure and axis
+    fig, ax = plt.subplots()
+    line, = ax.plot(x, y[0])
+
+    # Function to update the plot for each frame
+    def update(frame):
+        line.set_ydata(y[frame])
+        return line,
+
+    # Create the animation
+    ani = FuncAnimation(fig, update, frames=len(y), blit=True, interval=1000/60)
+
+    plt.show()
+
+x = solver.x
+y = [[np.linalg.norm(final_solution[k][0])/((L/J))]+[np.linalg.norm(final_solution[k][i])/(i*(L/J)) for i in range(1,len(final_solution[k]))] for k in range(len(final_solution))]
+generate_animation(solver.x, y)
