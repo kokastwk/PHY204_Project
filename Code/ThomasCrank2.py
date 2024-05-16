@@ -35,14 +35,10 @@ class CrankNicolsonSolver:
         main_diag = (1 - 2 * self.sigma) * np.ones(self.J,dtype=np.complex128)
         off_diag = (self.sigma)* np.ones(self.J-1,dtype=np.complex128)
         upper_diag = (self.sigma)* np.ones(self.J-1,dtype=np.complex128)
+        main_diag[0],main_diag[-1],off_diag[0],off_diag[-1],upper_diag[0],upper_diag[-1] = 0,0,0,0,0,0
 
         B = np.diag(main_diag) + np.diag(off_diag,-1) + np.diag(upper_diag,1)
         # for dirichlet condition with zero at ends
-        for i in range(J):
-            B[0, i] = 0
-            B[i, 0] = 0
-            B[J - 1, i] = 0
-            B[i, J - 1] = 0
 
         #B[0, 1] = 2 * self.sigma
 
@@ -53,7 +49,8 @@ class CrankNicolsonSolver:
     def simulate(self):
 
         U = self.U
-
+        U[0][0] = 0
+        U[0][-1] =0
         F = [[] for _ in range(N)]
         F[0] = self.dt * np.array([self.f(U[0][i],self.x[i]) for i in range(len(U[0]))],dtype=np.complex128)  # ! take into account x_0 and x_j-1 where f( ) should be 0
         F[0][0] = 0
@@ -65,8 +62,10 @@ class CrankNicolsonSolver:
         U.append([])
         A_csr = csr_matrix(self.A,dtype=np.complex128)
         U[1] = spsolve(A_csr, b)
+        U[1][0] = 0
+        U[1][-1] =0
 
-        for n in range(1, self.N - 1):  # Iterate through time steps
+        for n in range(1, self.N):  # Iterate through time steps
             F[n] = self.dt * np.array([self.f(U[n][i],self.x[i]) for i in range(len(U[n]))],dtype=np.complex128)
             F[n][0] = 0
             F[n][-1] = 0
@@ -79,6 +78,8 @@ class CrankNicolsonSolver:
             # print(b)
 
             U[n + 1] = spsolve(A_csr, b)
+            U[n + 1][0] = 0
+            U[n + 1][-1] = 0
 
         self.U = U
 
