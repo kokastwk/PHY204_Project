@@ -145,10 +145,10 @@ solver.simulate()
 final_solution = solver.U
 
 def scprobd(u):
-    return [(((np.abs(u[k])/(k)))**2) for k in range(len(u))]
+    return [(((np.abs(u[k])/(k)))**2) for k in range(1,len(u))]
 
 def rexpec(u):
-    return np.sum([(((np.abs(u[k]))**2)/(k)) for k in range(len(u))])  # r |psi|^2 r^2 dx = (u[k]^2)/(k*L/J)  (L/J)
+    return np.sum([(((np.abs(u[k]))**2)/(k)) for k in range(1,len(u))])  # r |psi|^2 r^2 dx = (u[k]^2)/(k*L/J)  (L/J)
 
 def psinorm(u):
     return np.sum(scprobd(u))
@@ -216,7 +216,7 @@ print("Done")
 
 
 plt.figure(figsize=(10, 5))
-plt.plot([x*L/J for x in range(len(final_solution[0]))], scprobd(final_solution[0]), linestyle='--')
+plt.plot([x*L/J for x in range(1,len(final_solution[0]))], scprobd(final_solution[0]), linestyle='--')
 plt.xlabel('x')
 plt.ylabel('ProbDens')
 plt.title('Probability Density at Initial Time')
@@ -225,7 +225,7 @@ print("Done")
 
 #plot probd vs x
 plt.figure(figsize=(10, 5))
-plt.plot([x*L/J for x in range(len(final_solution[-1]))], scprobd(final_solution[-1]), linestyle='--')
+plt.plot([x*L/J for x in range(1,len(final_solution[-1]))], scprobd(final_solution[-1]), linestyle='--')
 plt.xlabel('x')
 plt.ylabel('ProbDens')
 plt.title('Probability Density at Final Time')
